@@ -47,6 +47,8 @@ function create() {
     ball.body.bounce.y = 0.7;
 
     player.hasBall = false;
+    player.lastXDirection = null;
+
     actionPressed = false;
 }
 
@@ -63,11 +65,21 @@ function update() {
         ball.y = player.y+15;
     }
 
+    handleKeys();
+}
+
+
+function render() {
+}
+
+function handleKeys() {
     if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
         player.body.velocity.x = 200;
+        player.lastXDirection = 'RIGHT';
     }
     if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
         player.body.velocity.x = -200;
+        player.lastXDirection = 'LEFT';
     }
     if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && playerIsOnFloor(player)) {        
         player.body.velocity.y = -400;
@@ -93,10 +105,14 @@ function handleBall(player) {
         //Throw the ball.
         player.hasBall = false;
         ball.body.allowGravity = true;
-    }
-}
 
-function render() {
+        if (player.lastXDirection === 'RIGHT') {
+            ball.body.velocity.x = 400;
+        } else if (player.lastXDirection === 'LEFT') {
+            ball.body.velocity.x = -400;
+        }
+        ball.body.velocity.y = -200;
+    }
 }
 
 function doCollisions() {
