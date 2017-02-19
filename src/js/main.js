@@ -1,21 +1,24 @@
 var game = new Phaser.Game(800, 300, Phaser.AUTO, '', {preload: preload, create: create, update: update, render: render });
 
+var actionPressed;
 var player;
 var platformLeft, platformMiddle, platformRight;
 
 function preload() {
-    game.load.image('bunny', 'bunny.png');
-    game.load.image('platform', 'platform.png');
-    game.load.image('ball', 'ball.png');
+    game.load.image('ball', 'assets/ball.png');
+    game.load.image('bunny', 'assets/bunny.png');
+    game.load.image('platform', 'assets/platform.png');
 }
 
 function create() {
 
-    ball = game.add.sprite(400, 150, 'ball', 3);
-    player = game.add.sprite(300, 150, 'bunny', 2);
+    ball = game.add.sprite(400, 150, 'ball', 2);
+    player = game.add.sprite(300, 150, 'bunny', 3);
     platformLeft = game.add.sprite(100, 200, 'platform', 1);
     platformMiddle = game.add.sprite(325, 100, 'platform', 1);
     platformRight = game.add.sprite(550, 200, 'platform', 1);
+
+    game.world.swap(ball, player);
 
     platformLeft.width = 150;
     platformMiddle.width = 150;
@@ -42,6 +45,9 @@ function create() {
     player.body.bounce.y = 0.15;
     ball.body.bounce.x = 0.7;
     ball.body.bounce.y = 0.7;
+
+    player.hasBall = false;
+    actionPressed = false;
 }
 
 function update() {
@@ -49,8 +55,13 @@ function update() {
     doCollisions();
 
     player.body.velocity.x = 0;
-
     ball.body.velocity.x *= 0.99;
+
+    //Keep ball stuck to player
+    if (player.hasBall) {
+        ball.x = player.x+5;
+        ball.y = player.y+15;
+    }
 
     if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
         player.body.velocity.x = 200;
@@ -60,6 +71,28 @@ function update() {
     }
     if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && playerIsOnFloor(player)) {        
         player.body.velocity.y = -400;
+    }
+    if (game.input.keyboard.isDown(Phaser.Keyboard.F)) {
+        if (!actionPressed) {
+            actionPressed = true;
+            handleBall(player);
+        }
+    } else {
+        actionPressed = false;
+    }
+}
+
+function handleBall(player) {
+    if (!player.hasBall) {
+        //Attempt to pick up the ball.
+        if(game.physics.arcade.distanceBetween(player, ball) < 40) {
+            player.hasBall = true;
+            ball.body.allowGravity = false;
+        }
+    } else {
+        //Throw the ball.
+        player.hasBall = false;
+        ball.body.allowGravity = true;
     }
 }
 
