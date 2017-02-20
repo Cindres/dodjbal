@@ -8,14 +8,32 @@ var ball;
 var player;
 var dummyPlayer;
 var platformLeft, platformMiddle, platformRight;
+var ceiling, wallRight, floor, wallLeft;
 
 function preload() {
     game.load.image('ball', 'assets/ball.png');
     game.load.image('player', 'assets/bunny.png');
     game.load.image('platform', 'assets/platform.png');
+    game.load.image('wall', 'assets/wall.png');
 }
 
 function create() {
+    //TODO: Move all this wall creation to a different file (worth making a new class? Probably not.)
+    ceiling = game.add.sprite(0, 1, 'wall');
+    ceiling.height = 1;
+    ceiling.width = game.width;
+
+    wallRight = game.add.sprite(game.width-1, 0, 'wall');
+    wallRight.height = game.height;
+    wallRight.width = 1;
+
+    floor = game.add.sprite(0, game.height-1, 'wall');
+    floor.height = 1;
+    floor.width = game.width;
+
+    wallLeft = game.add.sprite(0, 0, 'wall');
+    wallLeft.height = game.height;
+    wallLeft.width = 1;
 
     platformLeft = game.add.sprite(100, 200, 'platform', 1);
     platformMiddle = game.add.sprite(325, 100, 'platform', 1);
@@ -23,8 +41,8 @@ function create() {
 
     ball = new Ball(game, 400, 150);
 
-    player = new Player(game, 300, 150);
-    dummyPlayer = new Player(game, 500, 150);
+    player = new Player(game, 300, 150, 'Real player');
+    dummyPlayer = new Player(game, 500, 150, 'Dummy Player');
 
     game.add.existing(ball);
     game.add.existing(player);
@@ -40,16 +58,25 @@ function create() {
     platformRight.width = 150;
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
-    game.physics.arcade.enable([platformLeft, platformMiddle, platformRight]);
+    game.physics.arcade.enable([ceiling, wallRight, floor, wallLeft, 
+        platformLeft, platformMiddle, platformRight]);
 
     game.physics.arcade.gravity.y = 700;
 
     platformLeft.body.allowGravity = false;
     platformMiddle.body.allowGravity = false;
     platformRight.body.allowGravity = false;
+    ceiling.body.allowGravity = false;
+    wallRight.body.allowGravity = false;
+    floor.body.allowGravity = false;
+    wallLeft.body.allowGravity = false;
     platformLeft.body.immovable = true;
     platformMiddle.body.immovable = true;
     platformRight.body.immovable = true;
+    ceiling.body.immovable = true;
+    wallRight.body.immovable = true;
+    floor.body.immovable = true;
+    wallLeft.body.immovable = true;
 
     actionPressed = false;
 }
@@ -119,8 +146,13 @@ function handleBall(player) {
 }
 
 function handleBallCollision(ball, target) {
+    if (ball.isActive && (target.key === 'wall' || target.key === 'platform')) {
+        ball.isActive = false;
+    }
     if (target.key === 'player' && ball.isActive && !target.hasBall) {
-        console.log("Hit");
+        //Track a score or something.
+        console.log(target.id + " was hit.");
+        ball.isActive = false;
     }
 }
 
@@ -141,4 +173,8 @@ function doCollisions() {
     game.physics.arcade.collide(ball, platformLeft);
     game.physics.arcade.collide(ball, platformMiddle);
     game.physics.arcade.collide(ball, platformRight);
+    game.physics.arcade.collide(ball, ceiling);
+    game.physics.arcade.collide(ball, wallRight);
+    game.physics.arcade.collide(ball, floor);
+    game.physics.arcade.collide(ball, wallLeft);
 }

@@ -1,10 +1,14 @@
 var Player = (function() {
 
+    this.id;
+
     this.hasBall;
 
     this.lastXDirection;
 
-    function Player(game, x, y) {
+    function Player(game, x, y, id) {
+
+        this.id = id;
 
         Phaser.Sprite.call(this, game, x, y, 'player');
         game.physics.arcade.enable([this]);
