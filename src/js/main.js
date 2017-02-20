@@ -1,3 +1,5 @@
+var Player = require('./player');
+
 var game = new Phaser.Game(800, 300, Phaser.AUTO, '', {preload: preload, create: create, update: update, render: render });
 
 var actionPressed;
@@ -13,12 +15,14 @@ function preload() {
 function create() {
 
     ball = game.add.sprite(400, 150, 'ball', 2);
-    player = game.add.sprite(300, 150, 'bunny', 3);
+    // player = game.add.sprite(300, 150, 'bunny', 3);
     platformLeft = game.add.sprite(100, 200, 'platform', 1);
     platformMiddle = game.add.sprite(325, 100, 'platform', 1);
     platformRight = game.add.sprite(550, 200, 'platform', 1);
 
-    game.world.swap(ball, player);
+    player = new Player(game);
+
+    game.world.swap(ball, player.sprite);
 
     platformLeft.width = 150;
     platformMiddle.width = 150;
@@ -28,7 +32,7 @@ function create() {
     ball.height = 15;
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
-    game.physics.arcade.enable([ball, platformLeft, platformMiddle, platformRight, player]);
+    game.physics.arcade.enable([ball, platformLeft, platformMiddle, platformRight]);
 
     game.physics.arcade.gravity.y = 700;
 
@@ -42,12 +46,8 @@ function create() {
     player.body.collideWorldBounds = true;
     ball.body.collideWorldBounds = true;
 
-    player.body.bounce.y = 0.15;
     ball.body.bounce.x = 0.7;
-    ball.body.bounce.y = 0.7;
-
-    player.hasBall = false;
-    player.lastXDirection = null;
+    ball.body.bounce.y = 0.7;    
 
     actionPressed = false;
 }
@@ -61,8 +61,8 @@ function update() {
 
     //Keep ball stuck to player
     if (player.hasBall) {
-        ball.x = player.x+5;
-        ball.y = player.y+15;
+        ball.x = player.sprite.x+5;
+        ball.y = player.sprite.y+15;
     }
 
     handleKeys();
@@ -97,7 +97,7 @@ function handleKeys() {
 function handleBall(player) {
     if (!player.hasBall) {
         //Attempt to pick up the ball.
-        if(game.physics.arcade.distanceBetween(player, ball) < 40) {
+        if(game.physics.arcade.distanceBetween(player.sprite, ball) < 40) {
             player.hasBall = true;
             ball.body.allowGravity = false;
         }
@@ -116,10 +116,10 @@ function handleBall(player) {
 }
 
 function doCollisions() {
-    game.physics.arcade.collide(player, platformLeft);
-    game.physics.arcade.collide(player, platformMiddle);
-    game.physics.arcade.collide(player, platformRight);
-    game.physics.arcade.collide(player, ball);
+    game.physics.arcade.collide(player.sprite, platformLeft);
+    game.physics.arcade.collide(player.sprite, platformMiddle);
+    game.physics.arcade.collide(player.sprite, platformRight);
+    game.physics.arcade.collide(player.sprite, ball);
 
     game.physics.arcade.collide(ball, platformLeft);
     game.physics.arcade.collide(ball, platformMiddle);
