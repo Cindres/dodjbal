@@ -1,4 +1,5 @@
 var Ball = require('./ball');
+var PlayerBuilder = require('./playerBuilder');
 var Player = require('./player');
 var PlatformBuilder = require('./platformBuilder');
 
@@ -6,24 +7,27 @@ var game = new Phaser.Game(800, 300, Phaser.AUTO, '', {preload: preload, create:
 
 var actionPressed;
 var ball;
-var player;
-var dummyPlayer;
+var player, dummyPlayer;
+var playerBuilder;
 
 function preload() {
     game.load.image('ball', 'assets/ball.png');
-    game.load.image('player', 'assets/bunny.png');
+    game.load.image('player', 'assets/player.png');
     game.load.image('platform', 'assets/platform.png');
 }
 
 function create() {
+
     game.physics.startSystem(Phaser.Physics.ARCADE);
+
+    playerBuilder = new PlayerBuilder(game);
 
     PlatformBuilder.buildDefaultPlatforms(game);
 
     ball = new Ball(game, 400, 150);
 
-    player = new Player(game, 300, 150, 'Real player');
-    dummyPlayer = new Player(game, 500, 150, 'Dummy Player');
+    player = playerBuilder.generateNewPlayer(300, 150);
+    dummyPlayer = playerBuilder.generateNewPlayer(500, 150);
 
     game.add.existing(ball);
     game.add.existing(player);
