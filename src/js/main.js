@@ -8,7 +8,6 @@ var actionPressed;
 var ball;
 var player;
 var dummyPlayer;
-var platformLeft, platformMiddle, platformRight;
 
 function preload() {
     game.load.image('ball', 'assets/ball.png');
