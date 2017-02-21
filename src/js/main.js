@@ -1,5 +1,6 @@
 var Ball = require('./ball');
 var Player = require('./player');
+var PlatformBuilder = require('./platformBuilder');
 
 var game = new Phaser.Game(800, 300, Phaser.AUTO, '', {preload: preload, create: create, update: update, render: render });
 
@@ -18,10 +19,7 @@ function preload() {
 function create() {
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
-    //TODO: Create a platform builder similar to the old wall builder.
-    platformLeft = game.add.sprite(100, 200, 'platform', 1);
-    platformMiddle = game.add.sprite(325, 100, 'platform', 1);
-    platformRight = game.add.sprite(550, 200, 'platform', 1);
+    PlatformBuilder.buildDefaultPlatforms(game);
 
     ball = new Ball(game, 400, 150);
 
@@ -39,20 +37,7 @@ function create() {
 
     game.world.swap(ball, player);
 
-    platformLeft.width = 150;
-    platformMiddle.width = 150;
-    platformRight.width = 150;
-
-    game.physics.arcade.enable([platformLeft, platformMiddle, platformRight]);
-
     game.physics.arcade.gravity.y = 700;
-
-    platformLeft.body.allowGravity = false;
-    platformMiddle.body.allowGravity = false;
-    platformRight.body.allowGravity = false;
-    platformLeft.body.immovable = true;
-    platformMiddle.body.immovable = true;
-    platformRight.body.immovable = true;
 
     actionPressed = false;
 }
@@ -137,20 +122,9 @@ function handleBallCollision(ball, target) {
 }
 
 function doCollisions() {
-    //TODO: Make players an array of players, do this dynamically.
-    game.physics.arcade.collide(player, platformLeft);
-    game.physics.arcade.collide(player, platformMiddle);
-    game.physics.arcade.collide(player, platformRight);
+    PlatformBuilder.doCollisions(game, [player, dummyPlayer, ball]);
+    
     game.physics.arcade.collide(player, ball);
-
-    game.physics.arcade.collide(dummyPlayer, platformLeft);
-    game.physics.arcade.collide(dummyPlayer, platformMiddle);
-    game.physics.arcade.collide(dummyPlayer, platformRight);
     game.physics.arcade.collide(dummyPlayer, ball);
-
     game.physics.arcade.collide(player, dummyPlayer);
-
-    game.physics.arcade.collide(ball, platformLeft);
-    game.physics.arcade.collide(ball, platformMiddle);
-    game.physics.arcade.collide(ball, platformRight);
 }
