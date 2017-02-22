@@ -54,7 +54,7 @@ function update() {
 
     //Keep ball stuck to player
     if (player.hasBall) {
-        ball.x = player.x+5;
+        ball.x = player.x+3;
         ball.y = player.y+15;
     }
 
@@ -91,6 +91,7 @@ function handleBall(player) {
     if (!player.hasBall) {
         //Attempt to pick up the ball.
         if(game.physics.arcade.distanceBetween(player, ball) < 45) {
+            ball.setColor(player.tint);
             player.hasBall = true;
             ball.isActive = true;
             ball.body.allowGravity = false;
@@ -115,12 +116,14 @@ function handleBallBoundsCollision(ball, target) {
 
 function handleBallCollision(ball, target) {
     if (ball.isActive && (target.key === 'wall' || target.key === 'platform')) {
+        ball.resetColor();
         ball.isActive = false;
     }
     if (target.key === 'player' && ball.isActive && !target.hasBall) {
         //Track a score or something.
         console.log(target.id + " was hit.");
         ball.isActive = false;
+        ball.resetColor();
     }
 }
 

@@ -6,8 +6,6 @@ var Player = (function() {
 
     this.lastXDirection;
 
-    this.color;
-
     function Player(game, x, y, id, color) {
 
         this.id = id;
