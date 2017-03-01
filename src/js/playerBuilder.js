@@ -26,7 +26,7 @@ var PlayerBuilder = (function () {
         var colorIndex = Math.floor(Math.random() * (this.availableColors.length));
 
         var gamepad;
-        switch(this.players.length) {
+        switch(this.playerCount) {
             case 0:
                 gamepad = this.game.input.gamepad.pad3;
                 break;
