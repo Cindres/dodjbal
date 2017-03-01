@@ -4,6 +4,8 @@ var Ball = (function() {
 
     this.isActive;
 
+    this.isHeld;
+
     function Ball(game, x, y) {
 
         this.defaultColor = '0xC0C0C0';
@@ -11,10 +13,14 @@ var Ball = (function() {
         Phaser.Sprite.call(this, game, x, y, 'ball');
         game.physics.arcade.enable([this]);
 
+        // Is the ball in the air & was it just thrown?
         this.isActive = false;
 
-        this.width = 15;
-        this.height = 15;
+        // Is the ball currently being held by a player?
+        this.isHeld = false;
+
+        this.width = 16;
+        this.height = 16;
 
         this.body.collideWorldBounds = true;
 

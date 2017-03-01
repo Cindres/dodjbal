@@ -5,9 +5,8 @@ var PlatformBuilder = require('./platformBuilder');
 
 var game = new Phaser.Game(800, 300, Phaser.AUTO, '', {preload: preload, create: create, update: update, render: render });
 
-var actionPressed;
 var ball;
-var player, dummyPlayer;
+var players;
 var playerBuilder;
 
 function preload() {
@@ -20,94 +19,46 @@ function create() {
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
+    ball = new Ball(game, 400, 150);
+
     playerBuilder = new PlayerBuilder(game);
 
     PlatformBuilder.buildDefaultPlatforms(game);
 
-    ball = new Ball(game, 400, 150);
+    game.input.gamepad.start();
 
-    player = playerBuilder.generateNewPlayer(300, 150);
-    dummyPlayer = playerBuilder.generateNewPlayer(500, 150);
+    players = [];
+    players[0] = playerBuilder.generateNewPlayer(300, 150);
+    players[1] = playerBuilder.generateNewPlayer(500, 150);
 
     game.add.existing(ball);
-    game.add.existing(player);
-    game.add.existing(dummyPlayer);
+    game.add.existing(players[0]);
+    game.add.existing(players[1]);
 
     ball.body.onCollide = new Phaser.Signal();
     ball.body.onWorldBounds = new Phaser.Signal();
     ball.body.onCollide.add(handleBallCollision, this);
     ball.body.onWorldBounds.add(handleBallBoundsCollision, this);
 
-    game.world.swap(ball, player);
+    game.world.swap(ball, players[0]);
+    game.world.swap(ball, players[1]);
 
     game.physics.arcade.gravity.y = 700;
-
-    actionPressed = false;
 }
 
 function update() {
 
     doCollisions();
 
-    player.body.velocity.x = 0;
     ball.body.velocity.x *= 0.99;
 
-    //Keep ball stuck to player
-    if (player.hasBall) {
-        ball.x = player.x+3;
-        ball.y = player.y+15;
+    for (var i = 0; i < players.length; i++) {
+        players[i].doUpdate(ball);
     }
-
-    handleKeys();
 }
 
 
 function render() {
-}
-
-function handleKeys() {
-    if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
-        player.body.velocity.x = 200;
-        player.lastXDirection = 'RIGHT';
-    }
-    if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
-        player.body.velocity.x = -200;
-        player.lastXDirection = 'LEFT';
-    }
-    if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && player.isOnFloor()) {        
-        player.body.velocity.y = -400;
-    }
-    if (game.input.keyboard.isDown(Phaser.Keyboard.F)) {
-        if (!actionPressed) {
-            actionPressed = true;
-            handleBall(player);
-        }
-    } else {
-        actionPressed = false;
-    }
-}
-
-function handleBall(player) {
-    if (!player.hasBall) {
-        //Attempt to pick up the ball.
-        if(game.physics.arcade.distanceBetween(player, ball) < 45) {
-            ball.setColor(player.tint);
-            player.hasBall = true;
-            ball.isActive = true;
-            ball.body.allowGravity = false;
-        }
-    } else {
-        //Throw the ball.
-        player.hasBall = false;
-        ball.body.allowGravity = true;
-
-        if (player.lastXDirection === 'RIGHT') {
-            ball.body.velocity.x = 400;
-        } else if (player.lastXDirection === 'LEFT') {
-            ball.body.velocity.x = -400;
-        }
-        ball.body.velocity.y = -200;
-    }
 }
 
 function handleBallBoundsCollision(ball, target) {
@@ -115,11 +66,11 @@ function handleBallBoundsCollision(ball, target) {
 }
 
 function handleBallCollision(ball, target) {
-    if (ball.isActive && (target.key === 'wall' || target.key === 'platform')) {
-        ball.resetColor();
+    if (!ball.isHeld && ball.isActive && (target.key === 'wall' || target.key === 'platform')) {
         ball.isActive = false;
+        ball.resetColor();
     }
-    if (target.key === 'player' && ball.isActive && !target.hasBall) {
+    if (target.key === 'player' && !ball.isHeld && ball.isActive && !target.hasBall) {
         //Track a score or something.
         console.log(target.id + " was hit.");
         ball.isActive = false;
@@ -128,9 +79,9 @@ function handleBallCollision(ball, target) {
 }
 
 function doCollisions() {
-    PlatformBuilder.doCollisions(game, [player, dummyPlayer, ball]);
+    PlatformBuilder.doCollisions(game, [players[0], players[1], ball]);
     
-    game.physics.arcade.collide(player, ball);
-    game.physics.arcade.collide(dummyPlayer, ball);
-    game.physics.arcade.collide(player, dummyPlayer);
+    game.physics.arcade.collide(players[0], ball);
+    game.physics.arcade.collide(players[1], ball);
+    game.physics.arcade.collide(players[0], players[1]);
 }
