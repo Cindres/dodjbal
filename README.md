@@ -1,7 +1,7 @@
 # spokboll
 A simple 2-player dodgeball game, currently requires 2 Xbox 360 controllers to be connected. 
 
-Use left stick to move, X button to grab and throw.
+Use left stick to move, X button to grab and throw, open console to see score triggers.
 
 # Build Instructions
 Requires NPM.
