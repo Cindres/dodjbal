@@ -62,7 +62,7 @@ function render() {
 }
 
 function handleBallBoundsCollision(ball, target) {
-    handleBallCollision(ball, {key: 'wall'});
+    handleBallCollision(ball, { key: 'wall' });
 }
 
 function handleBallCollision(ball, target) {
