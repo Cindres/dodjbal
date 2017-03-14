@@ -1,25 +1,33 @@
 var Player = (function() {
 
-    this.id;
+    this.game;
+
+    this.gamepad;
 
     this.hasBall;
 
-    this.game;
+    this.id;
 
     this.lastXDirection;
 
-    this.gamepad;
+    this.points;
+
+    this.tint;
 
     function Player(game, x, y, id, color, gamepad) {
 
         this.game = game;
+        this.gamepad = gamepad;
         this.id = id;
+        this.tint = color;
 
         Phaser.Sprite.call(this, game, x, y, 'player');
         game.physics.arcade.enable([this]);
 
-        this.width = 20;
         this.height = 40;
+        this.width = 20;
+
+        this.points = 0;
 
         this.hasBall = false;
         this.lastXDirection = null;
@@ -27,9 +35,6 @@ var Player = (function() {
         this.body.collideWorldBounds = true;
         this.body.bounce.y = 0.15;
 
-        this.tint = color;
-
-        this.gamepad = gamepad;
     }
 
     Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -46,6 +51,7 @@ var Player = (function() {
             if(this.game.physics.arcade.distanceBetween(this, ball) < 45 && !ball.isHeld) {
                 this.hasBall = true;
                 ball.isHeld = true;
+
                 ball.setColor(this.tint);
                 ball.body.allowGravity = false;
             }
@@ -54,6 +60,7 @@ var Player = (function() {
             ball.isActive = true;
             ball.isHeld = false;
             this.hasBall = false;
+            
             ball.body.allowGravity = true;
 
             if (this.lastXDirection === 'RIGHT') {
