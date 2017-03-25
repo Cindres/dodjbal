@@ -51,6 +51,7 @@ var Player = (function() {
             if(this.game.physics.arcade.distanceBetween(this, ball) < 45 && !ball.isHeld) {
                 this.hasBall = true;
                 ball.isHeld = true;
+                ball.thrower = this;
 
                 ball.setColor(this.tint);
                 ball.body.allowGravity = false;

@@ -6,6 +6,9 @@ var Ball = (function() {
 
     this.isHeld;
 
+    // Player that just threw the ball (if active)
+    this.thrower;
+
     function Ball(game, x, y) {
 
         this.defaultColor = '0xC0C0C0';

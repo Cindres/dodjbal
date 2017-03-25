@@ -8,6 +8,7 @@ var game = new Phaser.Game(800, 300, Phaser.AUTO, '', {preload: preload, create:
 var ball;
 var players;
 var playerBuilder;
+var score;
 
 function preload() {
     game.load.image('ball', 'assets/ball.png');
@@ -44,6 +45,15 @@ function create() {
     game.world.swap(ball, players[1]);
 
     game.physics.arcade.gravity.y = 700;
+
+    var scoreStyle = { font: "32px Arial",
+        fill: "#ff0044",
+        align: "center"
+    };
+
+    score = game.add.text(0, 0, '', scoreStyle);
+    updateScoreBoard();
+    score.x = (game.width / 2) - score.width / 2;
 }
 
 function update() {
@@ -73,8 +83,11 @@ function handleBallCollision(ball, target) {
     if (target.key === 'player' && !ball.isHeld && ball.isActive && !target.hasBall) {
         //Track a score or something.
         console.log(target.id + " was hit.");
+        ball.thrower.points++;
         ball.isActive = false;
+        ball.thrower = null;
         ball.resetColor();
+        updateScoreBoard();
     }
 }
 
@@ -84,4 +97,15 @@ function doCollisions() {
     game.physics.arcade.collide(players[0], ball);
     game.physics.arcade.collide(players[1], ball);
     game.physics.arcade.collide(players[0], players[1]);
+}
+
+function updateScoreBoard() {
+    var scoreText = '';
+    for (var i = 0; i < players.length; i++) {
+        scoreText += players[i].points;
+        if (i < players.length-1) {
+            scoreText += ' - ';
+        }
+    }
+    score.setText(scoreText);
 }

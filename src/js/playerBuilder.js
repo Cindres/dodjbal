@@ -28,10 +28,10 @@ var PlayerBuilder = (function () {
         var gamepad;
         switch(this.playerCount) {
             case 0:
-                gamepad = this.game.input.gamepad.pad3;
+                gamepad = this.game.input.gamepad.pad1;
                 break;
             case 1:
-                gamepad = this.game.input.gamepad.pad4;
+                gamepad = this.game.input.gamepad.pad2;
                 break;
             case 2:
                 // gamepad = this.game.input.gamepad.pad2;
